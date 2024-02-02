@@ -1,0 +1,26 @@
+version: '3.6'
+name: graphql-articles
+volumes:
+  db_data:
+services:
+  postgres:
+    image: postgres:12
+    # restart: always
+    volumes:
+      # - ${CONFIG_DIR}/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: my_database
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: my_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  main:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    
