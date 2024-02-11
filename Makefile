@@ -7,6 +7,10 @@ help: ## Show help
 	@echo 'targets:'
 	@egrep '^(.+)\:\ .*##\ (.+)' ${MAKEFILE_LIST} | sed 's/:.*##/#/' | column -t -c 2 -s '#'
 
+.PHONY: db
+db: ## Go to DB
+	- docker exec -it graphql-articles-postgres-1 psql -U postgres
+
 .PHONY: tools
 tools: ## Install required tools
 	go get -u github.com/99designs/gqlgen@v0.13.0
