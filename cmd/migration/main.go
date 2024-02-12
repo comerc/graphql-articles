@@ -2,16 +2,17 @@ package main
 
 import (
 	"context"
-	"github.com/acelot/articles/internal/feature/dbmigration"
-	"github.com/acelot/articles/internal/migration"
-	"github.com/docopt/docopt-go"
-	"github.com/go-pg/pg/v10"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/acelot/articles/internal/feature/dbmigration"
+	"github.com/acelot/articles/internal/migration"
+	"github.com/docopt/docopt-go"
+	"github.com/go-pg/pg/v10"
 )
 
 const migrationFileExt string = ".sql"
@@ -110,7 +111,7 @@ func updateCommand(directory string, databaseDsn string) {
 
 		filePath := filepath.Join(directory, name) + migrationFileExt
 
-		bytes, err := ioutil.ReadFile(filePath)
+		bytes, err := os.ReadFile(filePath)
 		if err != nil {
 			log.Fatalf("- failed: %v", err)
 		}
@@ -143,7 +144,7 @@ func updateCommand(directory string, databaseDsn string) {
 }
 
 func getAllMigrationFileNames(directory string) ([]string, error) {
-	files, err := ioutil.ReadDir(directory)
+	files, err := os.ReadDir(directory)
 	if err != nil {
 		return []string{}, err
 	}
