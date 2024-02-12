@@ -7,13 +7,9 @@ help: ## Show help
 	@echo 'targets:'
 	@egrep '^(.+)\:\ .*##\ (.+)' ${MAKEFILE_LIST} | sed 's/:.*##/#/' | column -t -c 2 -s '#'
 
-.PHONY: db
-db: ## Go to DB
-	- docker exec -it graphql-articles-postgres-1 psql -U postgres
-
 .PHONY: tools
 tools: ## Install required tools
-	go get -u github.com/99designs/gqlgen@v0.13.0
+	go get -u github.com/99designs/gqlgen@v0.17.43
 	go get -u github.com/vektah/dataloaden@v0.3.0
 	go get -u golang.org/x/lint/golint
 
@@ -35,22 +31,22 @@ test: generate ## Run `go test`
 
 .PHONY: generate-gqlgen
 generate-gqlgen: ## Generate GraphQL models and resolvers
-	gqlgen generate
+	go run github.com/99designs/gqlgen@v0.17.43 generate
 
 .PHONY: generate-dataloaders
 generate-dataloaders: ## Generate dataloaders
 	(cd internal/feature/article \
-     && dataloaden LoaderByID LoaderByIDKey \*github.com/acelot/articles/pkg/feature/article.Article)
+     && go run github.com/vektah/dataloaden@v0.3.0 LoaderByID LoaderByIDKey \*github.com/acelot/articles/pkg/feature/article.Article)
 	(cd internal/feature/articleblock \
-     && dataloaden LoaderByArticleID LoaderByArticleIDKey \[\]github.com/acelot/articles/pkg/feature/articleblock.ArticleBlock)
+     && go run github.com/vektah/dataloaden@v0.3.0 LoaderByArticleID LoaderByArticleIDKey \[\]github.com/acelot/articles/pkg/feature/articleblock.ArticleBlock)
 	(cd internal/feature/articletag \
-     && dataloaden LoaderByArticleID LoaderByArticleIDKey \[\]github.com/acelot/articles/pkg/feature/articletag.ArticleTag)
+     && go run github.com/vektah/dataloaden@v0.3.0 LoaderByArticleID LoaderByArticleIDKey \[\]github.com/acelot/articles/pkg/feature/articletag.ArticleTag)
 	(cd internal/feature/image \
-     && dataloaden LoaderByID LoaderByIDKey \*github.com/acelot/articles/pkg/feature/image.Image)
+     && go run github.com/vektah/dataloaden@v0.3.0 LoaderByID LoaderByIDKey \*github.com/acelot/articles/pkg/feature/image.Image)
 	(cd internal/feature/project \
-     && dataloaden LoaderByID LoaderByIDKey \*github.com/acelot/articles/pkg/feature/project.Project)
+     && go run github.com/vektah/dataloaden@v0.3.0 LoaderByID LoaderByIDKey \*github.com/acelot/articles/pkg/feature/project.Project)
 	(cd internal/feature/tag \
-     && dataloaden LoaderByID LoaderByIDKey \*github.com/acelot/articles/pkg/feature/tag.Tag)
+     && go run github.com/vektah/dataloaden@v0.3.0 LoaderByID LoaderByIDKey \*github.com/acelot/articles/pkg/feature/tag.Tag)
 
 .PHONY: generate
 generate: generate-gqlgen generate-dataloaders ## Generate all

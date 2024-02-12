@@ -1,8 +1,22 @@
 # graphql-articles
+
 Articles GraphQL Service
 
 Requierements:
+
 - libvips
+
+## Install PostgreSQL
+
+```bash
+$ docker run -p 5432:5432 --name postgres -e POSTGRES_DB=articles -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:latest
+```
+
+## Enter in PostgreSQL
+
+```bash
+$ docker exec -it postgres psql -U postgres articles
+```
 
 ## How to build
 
@@ -12,12 +26,12 @@ make build
 
 ## How to apply DB migrations
 
-```shell
-migration update postgres://user:pass@localhost/articles\?sslmode=disable
+```bash
+$ migration update postgres://postgres:@localhost:5432/articles\?sslmode=disable
 ```
 
 ## How to run app
 
-```shell
-app postgres://user:pass@localhost/articles\?sslmode=disable
+```bash
+$ app postgres://postgres:@postgres:5432/articles\?sslmode=disable
 ```

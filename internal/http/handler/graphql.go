@@ -4,6 +4,8 @@ package handler
 import (
 	"context"
 	"fmt"
+	"time"
+
 	gqlhandler "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
@@ -14,7 +16,6 @@ import (
 	"github.com/acelot/articles/internal/gql/runtime"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.uber.org/zap"
-	"time"
 )
 
 const websocketKeepAlivePingInterval = 5 * time.Second

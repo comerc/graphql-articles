@@ -23,6 +23,11 @@ type ArticleBlockFindResult interface {
 
 type ArticleBlockInterface interface {
 	IsArticleBlockInterface()
+	GetCreatedAt() time.Time
+	GetDeletedAt() *time.Time
+	GetID() uuid.UUID
+	GetModifiedAt() time.Time
+	GetSortRank() string
 }
 
 type ArticleBlockMoveResult interface {
@@ -79,6 +84,7 @@ type ImageUploadResult interface {
 
 type ProblemInterface interface {
 	IsProblemInterface()
+	GetMessage() string
 }
 
 type ProjectCreateResult interface {
@@ -119,14 +125,15 @@ type TotalCountResolvingResult interface {
 
 type VersionInterface interface {
 	IsVersionInterface()
+	GetVersion() uint
 }
 
 type Article struct {
 	Content      ArticleContentResolvingResult `json:"content"`
 	CoverImage   ImageResolvingResult          `json:"coverImage"`
-	CoverImageID *uuid.UUID                    `json:"coverImageId"`
+	CoverImageID *uuid.UUID                    `json:"coverImageId,omitempty"`
 	CreatedAt    time.Time                     `json:"createdAt"`
-	DeletedAt    *time.Time                    `json:"deletedAt"`
+	DeletedAt    *time.Time                    `json:"deletedAt,omitempty"`
 	ID           uuid.UUID                     `json:"id"`
 	ModifiedAt   time.Time                     `json:"modifiedAt"`
 	Project      ProjectResolvingResult        `json:"project"`
@@ -136,7 +143,8 @@ type Article struct {
 	Version      uint                          `json:"version"`
 }
 
-func (Article) IsVersionInterface() {}
+func (Article) IsVersionInterface()   {}
+func (this Article) GetVersion() uint { return this.Version }
 
 type ArticleBlockCreateInput struct {
 	ArticleID uuid.UUID            `json:"articleId"`
@@ -151,14 +159,14 @@ type ArticleBlockCreateOk struct {
 func (ArticleBlockCreateOk) IsArticleBlockCreateResult() {}
 
 type ArticleBlockDataInput struct {
-	HTML  *ArticleBlockHTMLDataInput  `json:"html"`
-	Image *ArticleBlockImageDataInput `json:"image"`
+	HTML  *ArticleBlockHTMLDataInput  `json:"html,omitempty"`
+	Image *ArticleBlockImageDataInput `json:"image,omitempty"`
 }
 
 type ArticleBlockFindFilterInput struct {
-	ArticleIDAnyOf []uuid.UUID            `json:"articleIdAnyOf"`
-	IDAnyOf        []uuid.UUID            `json:"idAnyOf"`
-	TypeAnyOf      []ArticleBlockTypeEnum `json:"typeAnyOf"`
+	ArticleIDAnyOf []uuid.UUID            `json:"articleIdAnyOf,omitempty"`
+	IDAnyOf        []uuid.UUID            `json:"idAnyOf,omitempty"`
+	TypeAnyOf      []ArticleBlockTypeEnum `json:"typeAnyOf,omitempty"`
 }
 
 type ArticleBlockFindList struct {
@@ -171,15 +179,22 @@ func (ArticleBlockFindList) IsArticleBlockFindResult() {}
 type ArticleBlockHTML struct {
 	CreatedAt  time.Time             `json:"createdAt"`
 	Data       *ArticleBlockHTMLData `json:"data"`
-	DeletedAt  *time.Time            `json:"deletedAt"`
+	DeletedAt  *time.Time            `json:"deletedAt,omitempty"`
 	ID         uuid.UUID             `json:"id"`
 	ModifiedAt time.Time             `json:"modifiedAt"`
 	SortRank   string                `json:"sortRank"`
 	Version    uint                  `json:"version"`
 }
 
-func (ArticleBlockHTML) IsArticleBlockInterface() {}
-func (ArticleBlockHTML) IsVersionInterface()      {}
+func (ArticleBlockHTML) IsArticleBlockInterface()      {}
+func (this ArticleBlockHTML) GetCreatedAt() time.Time  { return this.CreatedAt }
+func (this ArticleBlockHTML) GetDeletedAt() *time.Time { return this.DeletedAt }
+func (this ArticleBlockHTML) GetID() uuid.UUID         { return this.ID }
+func (this ArticleBlockHTML) GetModifiedAt() time.Time { return this.ModifiedAt }
+func (this ArticleBlockHTML) GetSortRank() string      { return this.SortRank }
+
+func (ArticleBlockHTML) IsVersionInterface()   {}
+func (this ArticleBlockHTML) GetVersion() uint { return this.Version }
 
 type ArticleBlockHTMLData struct {
 	Body string `json:"body"`
@@ -192,27 +207,34 @@ type ArticleBlockHTMLDataInput struct {
 type ArticleBlockImage struct {
 	CreatedAt  time.Time              `json:"createdAt"`
 	Data       *ArticleBlockImageData `json:"data"`
-	DeletedAt  *time.Time             `json:"deletedAt"`
+	DeletedAt  *time.Time             `json:"deletedAt,omitempty"`
 	ID         uuid.UUID              `json:"id"`
 	ModifiedAt time.Time              `json:"modifiedAt"`
 	SortRank   string                 `json:"sortRank"`
 	Version    uint                   `json:"version"`
 }
 
-func (ArticleBlockImage) IsArticleBlockInterface() {}
-func (ArticleBlockImage) IsVersionInterface()      {}
+func (ArticleBlockImage) IsArticleBlockInterface()      {}
+func (this ArticleBlockImage) GetCreatedAt() time.Time  { return this.CreatedAt }
+func (this ArticleBlockImage) GetDeletedAt() *time.Time { return this.DeletedAt }
+func (this ArticleBlockImage) GetID() uuid.UUID         { return this.ID }
+func (this ArticleBlockImage) GetModifiedAt() time.Time { return this.ModifiedAt }
+func (this ArticleBlockImage) GetSortRank() string      { return this.SortRank }
+
+func (ArticleBlockImage) IsVersionInterface()   {}
+func (this ArticleBlockImage) GetVersion() uint { return this.Version }
 
 type ArticleBlockImageData struct {
 	Image       ImageResolvingResult `json:"image"`
-	ImageID     *uuid.UUID           `json:"imageId"`
-	Copyright   *string              `json:"copyright"`
-	Description *string              `json:"description"`
+	ImageID     *uuid.UUID           `json:"imageId,omitempty"`
+	Copyright   *string              `json:"copyright,omitempty"`
+	Description *string              `json:"description,omitempty"`
 }
 
 type ArticleBlockImageDataInput struct {
-	ImageID     *uuid.UUID `json:"imageId"`
-	Copyright   *string    `json:"copyright"`
-	Description *string    `json:"description"`
+	ImageID     *uuid.UUID `json:"imageId,omitempty"`
+	Copyright   *string    `json:"copyright,omitempty"`
+	Description *string    `json:"description,omitempty"`
 }
 
 type ArticleBlockMoveInput struct {
@@ -238,8 +260,11 @@ type ArticleBlockNotFoundProblem struct {
 	Message string `json:"message"`
 }
 
-func (ArticleBlockNotFoundProblem) IsProblemInterface()         {}
-func (ArticleBlockNotFoundProblem) IsArticleBlockMoveResult()   {}
+func (ArticleBlockNotFoundProblem) IsProblemInterface()     {}
+func (this ArticleBlockNotFoundProblem) GetMessage() string { return this.Message }
+
+func (ArticleBlockNotFoundProblem) IsArticleBlockMoveResult() {}
+
 func (ArticleBlockNotFoundProblem) IsArticleBlockUpdateResult() {}
 
 type ArticleBlockQuery struct {
@@ -250,7 +275,9 @@ type ArticleBlockTypeMismatchProblem struct {
 	Message string `json:"message"`
 }
 
-func (ArticleBlockTypeMismatchProblem) IsProblemInterface()         {}
+func (ArticleBlockTypeMismatchProblem) IsProblemInterface()     {}
+func (this ArticleBlockTypeMismatchProblem) GetMessage() string { return this.Message }
+
 func (ArticleBlockTypeMismatchProblem) IsArticleBlockUpdateResult() {}
 
 type ArticleBlockUpdateInput struct {
@@ -282,7 +309,7 @@ type ArticleCreateOk struct {
 func (ArticleCreateOk) IsArticleCreateResult() {}
 
 type ArticleFindFilterInput struct {
-	IDAnyOf []uuid.UUID `json:"idAnyOf"`
+	IDAnyOf []uuid.UUID `json:"idAnyOf,omitempty"`
 }
 
 type ArticleFindList struct {
@@ -301,10 +328,14 @@ type ArticleNotFoundProblem struct {
 	Message string `json:"message"`
 }
 
-func (ArticleNotFoundProblem) IsProblemInterface()         {}
+func (ArticleNotFoundProblem) IsProblemInterface()     {}
+func (this ArticleNotFoundProblem) GetMessage() string { return this.Message }
+
 func (ArticleNotFoundProblem) IsArticleBlockCreateResult() {}
-func (ArticleNotFoundProblem) IsArticleUpdateResult()      {}
-func (ArticleNotFoundProblem) IsArticleTagCreateResult()   {}
+
+func (ArticleNotFoundProblem) IsArticleUpdateResult() {}
+
+func (ArticleNotFoundProblem) IsArticleTagCreateResult() {}
 
 type ArticleQuery struct {
 	Find ArticleFindResult `json:"find"`
@@ -321,13 +352,16 @@ type ArticleTag struct {
 	Version    uint               `json:"version"`
 }
 
-func (ArticleTag) IsVersionInterface() {}
+func (ArticleTag) IsVersionInterface()   {}
+func (this ArticleTag) GetVersion() uint { return this.Version }
 
 type ArticleTagAlreadyExistsProblem struct {
 	Message string `json:"message"`
 }
 
-func (ArticleTagAlreadyExistsProblem) IsProblemInterface()       {}
+func (ArticleTagAlreadyExistsProblem) IsProblemInterface()     {}
+func (this ArticleTagAlreadyExistsProblem) GetMessage() string { return this.Message }
+
 func (ArticleTagAlreadyExistsProblem) IsArticleTagCreateResult() {}
 
 type ArticleTagCreateInput struct {
@@ -371,11 +405,13 @@ type ArticleTagNotFoundProblem struct {
 }
 
 func (ArticleTagNotFoundProblem) IsProblemInterface()     {}
+func (this ArticleTagNotFoundProblem) GetMessage() string { return this.Message }
+
 func (ArticleTagNotFoundProblem) IsArticleTagMoveResult() {}
 
 type ArticleUpdateInput struct {
 	ID           uuid.UUID  `json:"id"`
-	CoverImageID *uuid.UUID `json:"coverImageId"`
+	CoverImageID *uuid.UUID `json:"coverImageId,omitempty"`
 	Title        string     `json:"title"`
 	Version      uint       `json:"version"`
 }
@@ -389,7 +425,7 @@ func (ArticleUpdateOk) IsArticleUpdateResult() {}
 type Image struct {
 	Assets     []*ImageAsset                `json:"assets"`
 	CreatedAt  time.Time                    `json:"createdAt"`
-	DeletedAt  *time.Time                   `json:"deletedAt"`
+	DeletedAt  *time.Time                   `json:"deletedAt,omitempty"`
 	Type       string                       `json:"type"`
 	Height     uint                         `json:"height"`
 	ID         uuid.UUID                    `json:"id"`
@@ -399,7 +435,9 @@ type Image struct {
 	Width      uint                         `json:"width"`
 }
 
-func (Image) IsVersionInterface()     {}
+func (Image) IsVersionInterface()   {}
+func (this Image) GetVersion() uint { return this.Version }
+
 func (Image) IsImageResolvingResult() {}
 
 type ImageAsset struct {
@@ -415,7 +453,7 @@ type ImageDownload struct {
 func (ImageDownload) IsImageDownloadResolvingResult() {}
 
 type ImageFindFilterInput struct {
-	IDAnyOf []uuid.UUID `json:"idAnyOf"`
+	IDAnyOf []uuid.UUID `json:"idAnyOf,omitempty"`
 }
 
 type ImageFindList struct {
@@ -434,20 +472,26 @@ type ImageNotFoundProblem struct {
 }
 
 func (ImageNotFoundProblem) IsProblemInterface()     {}
+func (this ImageNotFoundProblem) GetMessage() string { return this.Message }
+
 func (ImageNotFoundProblem) IsImageResolvingResult() {}
 
 type ImageNotRecognizedProblem struct {
 	Message string `json:"message"`
 }
 
-func (ImageNotRecognizedProblem) IsProblemInterface()  {}
+func (ImageNotRecognizedProblem) IsProblemInterface()     {}
+func (this ImageNotRecognizedProblem) GetMessage() string { return this.Message }
+
 func (ImageNotRecognizedProblem) IsImageUploadResult() {}
 
 type ImageNotSupportedTypeProblem struct {
 	Message string `json:"message"`
 }
 
-func (ImageNotSupportedTypeProblem) IsProblemInterface()  {}
+func (ImageNotSupportedTypeProblem) IsProblemInterface()     {}
+func (this ImageNotSupportedTypeProblem) GetMessage() string { return this.Message }
+
 func (ImageNotSupportedTypeProblem) IsImageUploadResult() {}
 
 type ImageQuery struct {
@@ -455,7 +499,7 @@ type ImageQuery struct {
 }
 
 type ImageUploadInput struct {
-	File *graphql.Upload `json:"file"`
+	File *graphql.Upload `json:"file,omitempty"`
 }
 
 type ImageUploadOk struct {
@@ -469,58 +513,95 @@ type InternalErrorProblem struct {
 }
 
 func (InternalErrorProblem) IsArticleContentResolvingResult() {}
-func (InternalErrorProblem) IsArticleTagsResolvingResult()    {}
-func (InternalErrorProblem) IsArticleBlockCreateResult()      {}
-func (InternalErrorProblem) IsArticleBlockMoveResult()        {}
-func (InternalErrorProblem) IsArticleBlockUpdateResult()      {}
-func (InternalErrorProblem) IsArticleBlockFindResult()        {}
-func (InternalErrorProblem) IsArticleCreateResult()           {}
-func (InternalErrorProblem) IsArticleUpdateResult()           {}
-func (InternalErrorProblem) IsArticleFindResult()             {}
-func (InternalErrorProblem) IsArticleTagCreateResult()        {}
-func (InternalErrorProblem) IsArticleTagMoveResult()          {}
-func (InternalErrorProblem) IsImageResolvingResult()          {}
-func (InternalErrorProblem) IsImageDownloadResolvingResult()  {}
-func (InternalErrorProblem) IsImageUploadResult()             {}
-func (InternalErrorProblem) IsImageFindResult()               {}
-func (InternalErrorProblem) IsProblemInterface()              {}
-func (InternalErrorProblem) IsProjectResolvingResult()        {}
-func (InternalErrorProblem) IsProjectCreateResult()           {}
-func (InternalErrorProblem) IsProjectUpdateResult()           {}
-func (InternalErrorProblem) IsProjectFindResult()             {}
-func (InternalErrorProblem) IsTagResolvingResult()            {}
-func (InternalErrorProblem) IsTagCreateResult()               {}
-func (InternalErrorProblem) IsTagUpdateResult()               {}
-func (InternalErrorProblem) IsTagFindResult()                 {}
-func (InternalErrorProblem) IsTotalCountResolvingResult()     {}
+
+func (InternalErrorProblem) IsArticleTagsResolvingResult() {}
+
+func (InternalErrorProblem) IsArticleBlockCreateResult() {}
+
+func (InternalErrorProblem) IsArticleBlockMoveResult() {}
+
+func (InternalErrorProblem) IsArticleBlockUpdateResult() {}
+
+func (InternalErrorProblem) IsArticleBlockFindResult() {}
+
+func (InternalErrorProblem) IsArticleCreateResult() {}
+
+func (InternalErrorProblem) IsArticleUpdateResult() {}
+
+func (InternalErrorProblem) IsArticleFindResult() {}
+
+func (InternalErrorProblem) IsArticleTagCreateResult() {}
+
+func (InternalErrorProblem) IsArticleTagMoveResult() {}
+
+func (InternalErrorProblem) IsImageResolvingResult() {}
+
+func (InternalErrorProblem) IsImageDownloadResolvingResult() {}
+
+func (InternalErrorProblem) IsImageUploadResult() {}
+
+func (InternalErrorProblem) IsImageFindResult() {}
+
+func (InternalErrorProblem) IsProblemInterface()     {}
+func (this InternalErrorProblem) GetMessage() string { return this.Message }
+
+func (InternalErrorProblem) IsProjectResolvingResult() {}
+
+func (InternalErrorProblem) IsProjectCreateResult() {}
+
+func (InternalErrorProblem) IsProjectUpdateResult() {}
+
+func (InternalErrorProblem) IsProjectFindResult() {}
+
+func (InternalErrorProblem) IsTagResolvingResult() {}
+
+func (InternalErrorProblem) IsTagCreateResult() {}
+
+func (InternalErrorProblem) IsTagUpdateResult() {}
+
+func (InternalErrorProblem) IsTagFindResult() {}
+
+func (InternalErrorProblem) IsTotalCountResolvingResult() {}
 
 type InvalidSortRankProblem struct {
 	Message string `json:"message"`
 }
 
 func (InvalidSortRankProblem) IsArticleBlockCreateResult() {}
-func (InvalidSortRankProblem) IsArticleBlockMoveResult()   {}
-func (InvalidSortRankProblem) IsArticleTagCreateResult()   {}
-func (InvalidSortRankProblem) IsArticleTagMoveResult()     {}
-func (InvalidSortRankProblem) IsProblemInterface()         {}
+
+func (InvalidSortRankProblem) IsArticleBlockMoveResult() {}
+
+func (InvalidSortRankProblem) IsArticleTagCreateResult() {}
+
+func (InvalidSortRankProblem) IsArticleTagMoveResult() {}
+
+func (InvalidSortRankProblem) IsProblemInterface()     {}
+func (this InvalidSortRankProblem) GetMessage() string { return this.Message }
+
+type Mutation struct {
+}
 
 type Project struct {
 	CreatedAt  time.Time  `json:"createdAt"`
-	DeletedAt  *time.Time `json:"deletedAt"`
+	DeletedAt  *time.Time `json:"deletedAt,omitempty"`
 	ID         uuid.UUID  `json:"id"`
 	ModifiedAt time.Time  `json:"modifiedAt"`
 	Name       string     `json:"name"`
 	Version    uint       `json:"version"`
 }
 
-func (Project) IsVersionInterface()       {}
+func (Project) IsVersionInterface()   {}
+func (this Project) GetVersion() uint { return this.Version }
+
 func (Project) IsProjectResolvingResult() {}
 
 type ProjectAlreadyExistsProblem struct {
 	Message string `json:"message"`
 }
 
-func (ProjectAlreadyExistsProblem) IsProblemInterface()    {}
+func (ProjectAlreadyExistsProblem) IsProblemInterface()     {}
+func (this ProjectAlreadyExistsProblem) GetMessage() string { return this.Message }
+
 func (ProjectAlreadyExistsProblem) IsProjectCreateResult() {}
 
 type ProjectCreateInput struct {
@@ -534,7 +615,7 @@ type ProjectCreateOk struct {
 func (ProjectCreateOk) IsProjectCreateResult() {}
 
 type ProjectFindFilterInput struct {
-	IDAnyOf []uuid.UUID `json:"idAnyOf"`
+	IDAnyOf []uuid.UUID `json:"idAnyOf,omitempty"`
 }
 
 type ProjectFindList struct {
@@ -553,10 +634,14 @@ type ProjectNotFoundProblem struct {
 	Message string `json:"message"`
 }
 
-func (ProjectNotFoundProblem) IsArticleCreateResult()    {}
-func (ProjectNotFoundProblem) IsProblemInterface()       {}
+func (ProjectNotFoundProblem) IsArticleCreateResult() {}
+
+func (ProjectNotFoundProblem) IsProblemInterface()     {}
+func (this ProjectNotFoundProblem) GetMessage() string { return this.Message }
+
 func (ProjectNotFoundProblem) IsProjectResolvingResult() {}
-func (ProjectNotFoundProblem) IsProjectUpdateResult()    {}
+
+func (ProjectNotFoundProblem) IsProjectUpdateResult() {}
 
 type ProjectQuery struct {
 	Find ProjectFindResult `json:"find"`
@@ -574,14 +659,20 @@ type ProjectUpdateOk struct {
 
 func (ProjectUpdateOk) IsProjectUpdateResult() {}
 
+type Query struct {
+}
+
 type SortRankInput struct {
 	Prev string `json:"prev"`
 	Next string `json:"next"`
 }
 
+type Subscription struct {
+}
+
 type Tag struct {
 	CreatedAt  time.Time  `json:"createdAt"`
-	DeletedAt  *time.Time `json:"deletedAt"`
+	DeletedAt  *time.Time `json:"deletedAt,omitempty"`
 	ID         uuid.UUID  `json:"id"`
 	ModifiedAt time.Time  `json:"modifiedAt"`
 	Name       string     `json:"name"`
@@ -589,14 +680,18 @@ type Tag struct {
 }
 
 func (Tag) IsVersionInterface()   {}
+func (this Tag) GetVersion() uint { return this.Version }
+
 func (Tag) IsTagResolvingResult() {}
 
 type TagAlreadyExistsProblem struct {
 	Message string `json:"message"`
 }
 
-func (TagAlreadyExistsProblem) IsProblemInterface() {}
-func (TagAlreadyExistsProblem) IsTagCreateResult()  {}
+func (TagAlreadyExistsProblem) IsProblemInterface()     {}
+func (this TagAlreadyExistsProblem) GetMessage() string { return this.Message }
+
+func (TagAlreadyExistsProblem) IsTagCreateResult() {}
 
 type TagCreateInput struct {
 	Name string `json:"name"`
@@ -609,7 +704,7 @@ type TagCreateOk struct {
 func (TagCreateOk) IsTagCreateResult() {}
 
 type TagFindFilterInput struct {
-	IDAnyOf []uuid.UUID `json:"idAnyOf"`
+	IDAnyOf []uuid.UUID `json:"idAnyOf,omitempty"`
 }
 
 type TagFindList struct {
@@ -629,9 +724,13 @@ type TagNotFoundProblem struct {
 }
 
 func (TagNotFoundProblem) IsArticleTagCreateResult() {}
-func (TagNotFoundProblem) IsProblemInterface()       {}
-func (TagNotFoundProblem) IsTagResolvingResult()     {}
-func (TagNotFoundProblem) IsTagUpdateResult()        {}
+
+func (TagNotFoundProblem) IsProblemInterface()     {}
+func (this TagNotFoundProblem) GetMessage() string { return this.Message }
+
+func (TagNotFoundProblem) IsTagResolvingResult() {}
+
+func (TagNotFoundProblem) IsTagUpdateResult() {}
 
 type TagQuery struct {
 	Find TagFindResult `json:"find"`
@@ -659,13 +758,20 @@ type VersionMismatchProblem struct {
 	Message string `json:"message"`
 }
 
-func (VersionMismatchProblem) IsArticleBlockMoveResult()   {}
+func (VersionMismatchProblem) IsArticleBlockMoveResult() {}
+
 func (VersionMismatchProblem) IsArticleBlockUpdateResult() {}
-func (VersionMismatchProblem) IsArticleUpdateResult()      {}
-func (VersionMismatchProblem) IsArticleTagMoveResult()     {}
-func (VersionMismatchProblem) IsProjectUpdateResult()      {}
-func (VersionMismatchProblem) IsTagUpdateResult()          {}
-func (VersionMismatchProblem) IsProblemInterface()         {}
+
+func (VersionMismatchProblem) IsArticleUpdateResult() {}
+
+func (VersionMismatchProblem) IsArticleTagMoveResult() {}
+
+func (VersionMismatchProblem) IsProjectUpdateResult() {}
+
+func (VersionMismatchProblem) IsTagUpdateResult() {}
+
+func (VersionMismatchProblem) IsProblemInterface()     {}
+func (this VersionMismatchProblem) GetMessage() string { return this.Message }
 
 type ArticleBlockFindSortEnum string
 

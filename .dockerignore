@@ -1,5 +1,5 @@
 .*
-migrations
+# migrations
 !.gqlgen.yml
 Dockerfile
 LICENSE
