@@ -20,9 +20,10 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-dev \
     liborc-dev \
     libgirepository1.0-dev \
-    gettext
-
-RUN apt-get install -y meson ninja-build
+    gettext \
+    ninja-build \
+    meson \ 
+    mc
 
 ARG VIPS_VER=8.14.2
 ARG VIPS_DLURL=https://github.com/libvips/libvips/releases/download
@@ -50,4 +51,7 @@ COPY . .
 # # Запускаем приложение
 # CMD ["./main"]
 
-CMD make build
+# CMD make build
+
+# Запустите команду, которая не завершается
+CMD tail -f /dev/null

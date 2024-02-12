@@ -4,16 +4,16 @@ volumes:
   db_data:
 services:
   postgres:
-    image: postgres:12
+    image: postgres:latest
     # restart: always
     volumes:
-      # - ${CONFIG_DIR}/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_DB: articles
       POSTGRES_USER: postgres
-      # POSTGRES_PASSWORD: pass
+      # POSTGRES_PASSWORD: password
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 10s
